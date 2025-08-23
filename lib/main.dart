@@ -8,6 +8,7 @@ import 'package:home_heal/screens/loading_screen.dart';
 import 'package:home_heal/screens/error_screen.dart';
 
 ColorScheme kColorScheme = ColorScheme.fromSeed(seedColor: Colors.green.shade600);
+ColorScheme kDarkColorScheme = ColorScheme.fromSeed(seedColor: Colors.green.shade900, brightness: Brightness.dark);
 
 late SupabaseClient supabase;
 
@@ -23,6 +24,10 @@ void main() async {
   runApp(MaterialApp(
       theme: ThemeData.light().copyWith(
         colorScheme: kColorScheme,
+        textTheme: GoogleFonts.loraTextTheme()
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        colorScheme: kDarkColorScheme,
         textTheme: GoogleFonts.loraTextTheme()
       ),
       home: StreamBuilder(stream: supabase.auth.onAuthStateChange, builder: (ctx, snapshot){
