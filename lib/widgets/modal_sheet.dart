@@ -210,7 +210,7 @@ class _ModalSheetState extends State<ModalSheet> {
                 ]
               ),
             ),
-            IntrinsicHeight(child: TextField(decoration: InputDecoration(label: Text('Duration (minutes)'), hint: Text('Default 1')), controller: duration, )),
+            IntrinsicHeight(child: TextField(decoration: InputDecoration(label: Text('Duration (minutes)'), hint: Text('Default 1 minute')), controller: duration, )),
             IntrinsicHeight(child: TextField(decoration: InputDecoration(label: Text('Notes')), controller: notes, maxLines: 5,)),
             Expanded(
               child: Row(
