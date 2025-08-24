@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:home_heal/screens/homepage.dart';
 import 'package:home_heal/screens/logs.dart';
+import 'package:home_heal/screens/remedies.dart';
 import 'package:home_heal/screens/trends_screen.dart';
 
 class StyledDrawer extends StatelessWidget{
@@ -42,7 +43,7 @@ class StyledDrawer extends StatelessWidget{
             Navigator.push(context, MaterialPageRoute(builder: (ctx) => TrendsScreen()));
           },),
           ListTile(title: Text('Remedies'), trailing: Icon(Icons.medical_information), onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (ctx) => TrendsScreen()));
+            Navigator.push(context, MaterialPageRoute(builder: (ctx) => RemediesScreen()));
           },),
         ]
       ),

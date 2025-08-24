@@ -16,23 +16,23 @@ class _PieChartWidgetState extends State<PieChartWidget> {
 
   List<PieChartSectionData> get pieChartSectionData{
     final List<PieChartSectionData> result = [];
-    final List<Enum> data = widget.data.map((value) {
-      if (chosenAttribute == Attributes.severity){
-        return getSeverity(value['severity']);
-      }
-      else if (chosenAttribute == Attributes.pains){
-        return getPainType(value['pain_type']);
-      }
-      else if (chosenAttribute == Attributes.symptoms){
-        return getSymptomType(value['symptom_type']);
-      }
-      else {
-        return getSeverity(value['severity']);
-      }
-    }).toList();
-    for (Enum value in data){
-      PieChartSectionData(value: 1, radius: 40);
-    }
+    // final List<Enum> data = widget.data.map((value) {
+    //   if (chosenAttribute == Attributes.severity){
+    //     return getSeverity(value['severity']);
+    //   }
+    //   else if (chosenAttribute == Attributes.pains){
+    //     return getPainType(value['pain_type']);
+    //   }
+    //   else if (chosenAttribute == Attributes.symptoms){
+    //     return getSymptomType(value['symptom_type']);
+    //   }
+    //   else {
+    //     return getSeverity(value['severity']);
+    //   }
+    // }).toList();
+    // for (Enum value in data){
+    //   PieChartSectionData(value: 1, radius: 40);
+    // }
     return result;
   }
 

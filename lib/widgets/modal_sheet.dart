@@ -117,8 +117,7 @@ class _ModalSheetState extends State<ModalSheet> {
       
       Navigator.pop(context, true);
 
-    } on PostgrestException catch (e) {
-      print(e);
+    } on PostgrestException{
       if(context.mounted) {Navigator.of(context).pop();}
     }
     setState(() {
@@ -139,8 +138,6 @@ class _ModalSheetState extends State<ModalSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Expanded(child: TextField(decoration: InputDecoration(label: Text(DateFormat.yMMMEd().format(eventDate))))),
-            // Expanded(child: TextField(decoration: InputDecoration(label: Text(formattedEventTime)),)),
             InkWell(
               onTap: chooseDate,
               splashColor: Theme.of(context).colorScheme.inversePrimary,
