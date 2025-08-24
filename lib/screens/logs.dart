@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:home_heal/main.dart';
 import 'package:home_heal/widgets/add_event_button.dart';
 import 'package:home_heal/widgets/drawer.dart';
+import 'package:home_heal/widgets/log_item.dart';
 import 'package:home_heal/widgets/modal_sheet.dart';
 
 class LogPage extends StatefulWidget{
@@ -46,6 +47,7 @@ class _LogPageState extends State<LogPage>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text("Logs"),
         actions: [
           IconButton(icon: Icon(Icons.refresh), onPressed: (){
             symptoms.clear();
@@ -58,29 +60,19 @@ class _LogPageState extends State<LogPage>{
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(controller: _scrollController, itemCount: itemCount, itemBuilder: (ctx, index){
-              if (itemCount == 0 && !_isLodaing){
-                return Text('No results found. Try adding some using the button at the bottom of the screen');
-              }
+            child: !(itemCount == 0 && !_isLodaing)? ListView.builder(controller: _scrollController, itemCount: itemCount, itemBuilder: (ctx, index){
+
               return InkWell(
                 onTap: () async {
                   bool? result = await showModalBottomSheet(isScrollControlled: true, useSafeArea: true, context: context, builder: (ctx) => ModalSheet.editing(data: symptoms[index]));
                   result?? false? setState((){}): null;
                 },
-                child: Card(
-                  key: ValueKey(symptoms[index]['id']),
-                  child: Column(
-                    children: [
-                      Text(symptoms[index]['symptom_type']),
-                      Text(symptoms[index]['duration'].toString()),
-                      Text(symptoms[index]['notes']),
-                      Text(symptoms[index]['pain_type']),
-                      Text(symptoms[index]['severity']),
-                    ],
-                  ),
-                ),
+                child: LogItem(symptoms[index])
               );
-            }),
+            }): Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(child: Text('No results found. Try adding some using the button at the bottom of the screen')),
+            ),
           ),
           _isLodaing? CircularProgressIndicator():SizedBox()
         ]

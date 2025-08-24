@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:home_heal/screens/homepage.dart';
 import 'package:home_heal/screens/logs.dart';
+import 'package:home_heal/screens/trends_screen.dart';
 
 class StyledDrawer extends StatelessWidget{
   const StyledDrawer({super.key});
@@ -31,12 +32,18 @@ class StyledDrawer extends StatelessWidget{
               ),
             ),
           ),
+          ListTile(title: Text('Home'), trailing: Icon(Icons.home), onTap: () {
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (ctx) => HomePage()), (route) => false,);
+          },),
           ListTile(title: Text('Logs'), trailing: Icon(Icons.list), onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (ctx) => LogPage()));
           },),
-          ListTile(title: Text('Home'), trailing: Icon(Icons.home), onTap: () {
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (ctx) => HomePage()), (route) => false,);
-          },)
+          ListTile(title: Text('Insights'), trailing: Icon(Icons.trending_up_outlined), onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (ctx) => TrendsScreen()));
+          },),
+          ListTile(title: Text('Remedies'), trailing: Icon(Icons.medical_information), onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (ctx) => TrendsScreen()));
+          },),
         ]
       ),
     );

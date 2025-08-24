@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:home_heal/main.dart';
+import 'package:home_heal/models.dart';
 // import 'package:home_heal/models.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -45,10 +46,10 @@ class _ModalSheetState extends State<ModalSheet> {
   DateTime eventDate = DateTime.now();
   TimeOfDay eventTime = TimeOfDay.now();
   bool _isLoading = false;
-  TextEditingController severityController = TextEditingController();
-  TextEditingController painType = TextEditingController();
+  Severity _severity = Severity.minimal;
+  Symptoms _symptom = Symptoms.irritation;
+  Pains _pains = Pains.aching;
   TextEditingController duration = TextEditingController();
-  TextEditingController symptomType = TextEditingController();
   TextEditingController notes = TextEditingController();
 
   @override
@@ -56,10 +57,10 @@ class _ModalSheetState extends State<ModalSheet> {
     super.initState();
     eventDate = widget.date;
     eventTime = widget.time;
-    severityController = TextEditingController(text: widget.severity);
-    painType = TextEditingController(text: widget.painType);
+    _severity = getSeverity(widget.severity);
+    _symptom = getSymptomType(widget.symptomType);
+    _pains = getPainType(widget.painType);
     duration = TextEditingController(text: widget.duration);
-    symptomType = TextEditingController(text: widget.symptomType);
     notes = TextEditingController(text: widget.notes);
   }
 
@@ -67,10 +68,7 @@ class _ModalSheetState extends State<ModalSheet> {
 
   @override
   void dispose() {
-    severityController.dispose();
-    painType.dispose();
     duration.dispose();
-    symptomType.dispose();
     notes.dispose();
     super.dispose();
   }
@@ -99,21 +97,21 @@ class _ModalSheetState extends State<ModalSheet> {
       if (!widget.isEditing){
         await supabase.from('symptoms').insert({
         'event_time': finalDateTime,
-        'severity': severityController.text,
+        'severity': _severity.toString().substring(9),
         'duration': int.tryParse(duration.text)?? 1,
-        'symptom_type': symptomType.text,
+        'symptom_type': _symptom.formattedSymptom(_symptom),
         'notes': notes.text,
-        'pain_type': painType.text
+        'pain_type': _pains.toString().substring(6)
         });
       } 
       else if (widget.id != null){
         await supabase.from('symptoms').update({
           'event_time': finalDateTime,
-          'severity': severityController.text,
+          'severity': _severity.toString().substring(9),
           'duration': int.tryParse(duration.text)?? 1,
-          'symptom_type': symptomType.text,
+          'symptom_type': _symptom.formattedSymptom(_symptom),
           'notes': notes.text,
-          'pain_type': painType.text
+          'pain_type': _pains.toString().substring(6)
         }).eq('id', widget.id!);
       }
       
@@ -130,75 +128,105 @@ class _ModalSheetState extends State<ModalSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.only(top: 15),
-      // child: Column(
-      //   children: [
-          // Text("At what date and time did this happen?"),
-          // Row(
-          //   children: [
-          //     InkWell(
-          //       splashColor: Theme.of(context).colorScheme.inversePrimary,
-          //       onTap: chooseDate,
-          //       child: Container(
-          //         padding: EdgeInsets.all(10),
-          //         decoration: BoxDecoration(color: Theme.of(context).colorScheme.primaryContainer),
-          //         child: Text(DateFormat.yMMMEd().format(eventDate), style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).colorScheme.onPrimaryContainer),)
-          //       ),
-          //     ),
-          //     InkWell(
-          //       splashColor: Theme.of(context).colorScheme.inversePrimary,
-          //       onTap: chooseTime,
-          //       child: Container(
-          //         padding: EdgeInsets.all(10),
-          //         decoration: BoxDecoration(color: Theme.of(context).colorScheme.primaryContainer),
-          //         child: Text(formattedEventTime, style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).colorScheme.onPrimaryContainer),)
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          // Text('How severe was it?'),
-          // DropdownMenu(
-          //   dropdownMenuEntries: [
-          //     DropdownMenuEntry(value: '', label: '')
-          //   ]
-          // ),
-          // Expanded(
-          //   child: GridView.custom(
-          //     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          //       maxCrossAxisExtent: 100,
-          //       mainAxisSpacing: 5,
-          //       crossAxisSpacing: 5,
-          //     ), 
-          //     childrenDelegate: SliverChildListDelegate([
-          //       for (Severity value in Severity.values)
-          //         RadioListTile(value: value, groupValue: severity, onChanged: (value){setState((){});}, title: Text(value.toString()),)
-          //     ])
-          //   ),
-          // ),
-          // Row(
-          //   mainAxisSize: MainAxisSize.min,
-          //   children: [
-          //     for (Severity value in Severity.values)
-          //       Expanded(child: RadioListTile(value: value, groupValue: severity, onChanged: (value){setState((){});}, title: Text(value.toString()),))
-          //   ],
-          // )
-      //   ],
-      // ),
-      child: Column(
-        children: [
-          TextField(decoration: InputDecoration(label: Text(DateFormat.yMMMEd().format(eventDate)))),
-          TextField(decoration: InputDecoration(label: Text(formattedEventTime)),),
-          TextField(decoration: InputDecoration(label: Text('Severity')), controller: severityController),
-          TextField(decoration: InputDecoration(label: Text('Pain Type')), controller: painType),
-          TextField(decoration: InputDecoration(label: Text('Sypmptom type')), controller: symptomType),
-          TextField(decoration: InputDecoration(label: Text('Notes')), controller: notes),
-          TextField(decoration: InputDecoration(label: Text('Duration')), controller: duration),
-          _isLoading? CircularProgressIndicator() : ElevatedButton(onPressed: addEvent, child: Text(widget.isEditing? 'Save Changes':'Add event')),
-          OutlinedButton(onPressed: (){Navigator.of(context).pop(false);}, child: Text("Cancel"))
-        ],
+    return SingleChildScrollView(
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        margin: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(15),
+        alignment: Alignment.centerLeft,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Expanded(child: TextField(decoration: InputDecoration(label: Text(DateFormat.yMMMEd().format(eventDate))))),
+            // Expanded(child: TextField(decoration: InputDecoration(label: Text(formattedEventTime)),)),
+            InkWell(
+              onTap: chooseDate,
+              splashColor: Theme.of(context).colorScheme.inversePrimary,
+              child: Container(
+                padding: EdgeInsets.all(15),
+                decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: Colors.grey))),
+                alignment: Alignment.centerLeft,
+                child: Text(DateFormat.yMMMEd().format(eventDate)),
+              ),
+            ),
+            InkWell(
+              onTap: chooseTime,
+              splashColor: Theme.of(context).colorScheme.inversePrimary,
+              child: Container(
+                padding: EdgeInsets.all(15),
+                decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: Colors.grey))),
+                alignment: Alignment.centerLeft,
+                child: Text(formattedEventTime),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Text('Rate the severity of the symptom: ${_severity.toString().substring(9)}'),
+            ),
+            Slider(
+              value: getSeverityNumber(_severity), 
+              onChanged: (value){
+                setState(() {
+                  _severity = getSeverityFromDouble(value);
+                });
+              },
+              label: _severity.toString().substring(9),
+              min: 1,
+              max: 10,
+              divisions: 10,
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 8),
+              child: DropdownMenu(
+                label: Text('What kind of pain or discomfort did you experience?'),
+                initialSelection: Pains.aching,
+                onSelected: (value){
+                  if (value != null){
+                    setState(() {
+                      _pains = value;
+                    });
+                  }
+                },
+                dropdownMenuEntries: [
+                  for (Pains pain in Pains.values)
+                    DropdownMenuEntry(value: pain, label: pain.toString().substring(6))
+                ]
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 8),
+              child: DropdownMenu(
+                label: Text('What kind of symptom did you experience?'),
+                initialSelection: Symptoms.irritation,
+                onSelected: (value){
+                  if (value != null){
+                    setState(() {
+                      _symptom = value;
+                    });
+                  }
+                },
+                dropdownMenuEntries: [
+                  for (Symptoms symptom in Symptoms.values)
+                    DropdownMenuEntry(value: symptom, label: symptom.formattedSymptom(symptom))
+                ]
+              ),
+            ),
+            IntrinsicHeight(child: TextField(decoration: InputDecoration(label: Text('Duration (minutes)'), hint: Text('Default 1')), controller: duration, )),
+            IntrinsicHeight(child: TextField(decoration: InputDecoration(label: Text('Notes')), controller: notes, maxLines: 5,)),
+            Expanded(
+              child: Row(
+                children: [
+                  Spacer(),
+                  OutlinedButton(onPressed: (){Navigator.of(context).pop(false);}, child: Text("Cancel")),
+                  SizedBox(width: 20,),
+                  _isLoading? CircularProgressIndicator() : ElevatedButton(onPressed: addEvent, child: Text(widget.isEditing? 'Save Changes':'Add event')),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
